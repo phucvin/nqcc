@@ -16,5 +16,7 @@ make test
 
 ./test_examples.sh
 
+dune exec --profile=release nqcc examples/binops/ex1.c
+
 Notes:
 - https://compiler-explorer.com/z/9Eojhb5xW

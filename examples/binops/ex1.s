@@ -3,7 +3,7 @@
 main:
     push %ebp
     movl %esp, %ebp
-    movl    $5, %eax
+    movl    $9, %eax
     push %eax
     movl    $2, %eax
     movl %eax, %ecx
