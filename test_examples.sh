@@ -5,7 +5,7 @@ do
     expected=$?             #get exit code
     ./nqcc $i              #compile with nqcc
     base="${i%.*}"
-    $base                  #run the thing we assembled
+    $base.out                  #run the thing we assembled
     actual=$?                #get exit code
     echo -n "$i:    "
     if [ "$expected" -ne "$actual" ]
@@ -14,7 +14,7 @@ do
     else
         echo "OK"
     fi
-    rm $base
+    # rm $base
 done
 
 #cleanup

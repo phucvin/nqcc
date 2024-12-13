@@ -3,12 +3,15 @@
 main:
     push %ebp
     movl %esp, %ebp
+    movl    $0, %eax
+    cmp     $0, %eax
+    je      post_if0
+    movl    $4, %eax
+    movl %ebp, %esp
+    pop %ebp
+    ret
+post_if0:
     movl    $5, %eax
-    push %eax
-    movl    $2, %eax
-    movl %eax, %ecx
-    pop %eax
-    addl %ecx, %eax
     movl %ebp, %esp
     pop %ebp
     ret

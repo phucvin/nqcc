@@ -3,9 +3,9 @@
 main:
     push %ebp
     movl %esp, %ebp
-    movl    $5, %eax
+    movl    $3, %eax
     push %eax
-    movl    $2, %eax
+    movl    $97, %eax
     movl %eax, %ecx
     pop %eax
     addl %ecx, %eax

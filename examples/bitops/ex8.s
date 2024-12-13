@@ -3,12 +3,13 @@
 main:
     push %ebp
     movl %esp, %ebp
-    movl    $5, %eax
+    movl    $1, %eax
+    neg %eax
     push %eax
     movl    $2, %eax
     movl %eax, %ecx
     pop %eax
-    addl %ecx, %eax
+    sarl %cl, %eax
     movl %ebp, %esp
     pop %ebp
     ret
