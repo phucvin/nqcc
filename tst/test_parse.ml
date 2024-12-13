@@ -80,8 +80,8 @@ and compare_block_items expected actual =
 
 let compare_funs expected actual =
   match expected, actual with
-  | FunDecl { fun_type=t1; name=name1; params=params1; body=Some body1 },
-    FunDecl { fun_type=t2; name=name2; params=params2; body=Some body2 } ->
+  | Function { fun_type=t1; name=name1; params=params1; body=Some body1 },
+    Function { fun_type=t2; name=name2; params=params2; body=Some body2 } ->
      t1 == t2 && compare_ids name1 name2 && List.for_all2 compare_params params1 params2 && List.for_all2 compare_block_items body1 body2
   | _ -> false
 
@@ -117,7 +117,7 @@ let test_compare_asts tokens expected_ast test_ctxt =
 let make_ast params block_items =
   let body = block_items in
   let name = ID "main" in
-  let f = FunDecl { fun_type=IntType; name; params; body=Some body } in
+  let f = Function { fun_type=IntType; name; params; body=Some body; storage_class=Nothing } in
   Prog([f])
 
 let make_simple_ast params exp =
@@ -381,6 +381,7 @@ let declaration_ast =
   let decl = Decl { var_type = IntType;
                     var_name = ID "a";
                     init = Some (make_int 2);
+                    storage_class = Nothing;
                     }
   in
   let ret = Statement (ReturnVal (Var (ID "a"))) in
@@ -392,6 +393,7 @@ let assignment_ast =
   let decl = Decl { var_type = IntType;
                     var_name = ID "a";
                     init = None;
+                    storage_class = Nothing;
                }
   in
   let assign = make_exp_statement (Assign (Equals, ID "a", make_int 2)) in
@@ -403,12 +405,14 @@ let multi_assign_tokens = Lex.lex "int main(){int a; int b = a = 2; return b;}"
 let multi_assign_ast =
   let decl_1 = (Decl { var_type = IntType;
                            var_name = ID "a";
-                           init = None
+                           init = None;
+                           storage_class = Nothing;
                }) in
   let assign = (Assign (Equals, ID "a", make_int 2)) in
   let decl_2 = (Decl { var_type = IntType;
                            var_name = ID "b";
-                           init = Some assign
+                           init = Some assign;
+                           storage_class = Nothing;
                }) in
   let ret = (Statement (ReturnVal (Var (ID "b")))) in
   let statements = [decl_1; decl_2; ret] in
@@ -463,7 +467,7 @@ let for_ast =
 
 let for_compound_tokens = Lex.lex "int main() {int a; for(a=0; a<5; a=a+1){ 1+1; if(a<5) {return 3;} } }"
 let for_compound_ast =
-  let decl = Decl { var_type = IntType; var_name = ID "a"; init = None } in
+  let decl = Decl { var_type = IntType; var_name = ID "a"; init = None; storage_class = Nothing } in
   let init = Assign (Equals, ID "a", make_int 0) in
   let post = Assign (Equals, ID "a", BinOp (Add, Var(ID "a"), make_int 1)) in
   let cond = BinOp (Lt, Var(ID "a"), make_int 5) in
@@ -477,7 +481,7 @@ let for_compound_ast =
 let for_declaration_tokens = Lex.lex "int main() {for(int a; 1; 1) { 1;}}"
 let for_decl_ast =
   let const = make_int 1 in
-  let decl = { var_type = IntType; var_name = ID "a"; init = None} in
+  let decl = { var_type = IntType; var_name = ID "a"; init = None; storage_class = Nothing } in
   let for_loop = Statement (ForDecl { init=decl; cond=const; post=Some const; body=Block [make_exp_statement const] }) in
   make_ast [] [for_loop]
 
@@ -533,13 +537,13 @@ let while_parse_tests = [
 
 (* FUNCTION CALLS *)
 
-let make_foo_decl params = FunDecl { fun_type=IntType; name=ID "foo"; params; body=Some [] }
+let make_foo_decl params = Function { fun_type=IntType; name=ID "foo"; params; body=Some []; storage_class = Nothing }
 
 let make_fun_call_program params args =
   let foo_decl = make_foo_decl params in
   let fun_call = FunCall (ID "foo", args) in
   let main_body = [Statement (ReturnVal fun_call)] in
-  let main_decl = FunDecl { fun_type=IntType; name=ID "main"; params=[]; body=Some main_body } in
+  let main_decl = Function { fun_type=IntType; name=ID "main"; params=[]; body=Some main_body; storage_class = Nothing } in
   Prog [foo_decl; main_decl]
 
 let make_param name = Param (IntType, ID name)
@@ -579,7 +583,7 @@ let one_paren = Lex.lex "int main() {return (1;}"
 let backwards_parens = Lex.lex "int main() {return )1+2;}"
 
 let failure_parse_tests = [
-    "test_parse_fail" >:: test_expect_failure bad_token_list "Parse error in parse_fun: bad function type or name";
+    "test_parse_fail" >:: test_expect_failure bad_token_list "Parse error in parse_top_level: bad toplevel name or top";
     "test_semicolon_required" >:: test_expect_failure missing_semicolon "Expected semicolon after return statement";
     "test_incomplete_addition" >:: test_expect_failure incomplete_addition "Failed to parse factor";
     "test_mismatched_parens" >:: test_expect_failure mismatched_parens "Syntax error: expected close paren";

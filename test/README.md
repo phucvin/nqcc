@@ -6,6 +6,8 @@ opam init
 
 opam install oasis batteries ounit
 
+opam install ocaml-lsp-server ocamlformat
+
 eval $(opam env)
 
 eval `opam config env`

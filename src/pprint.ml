@@ -122,7 +122,7 @@ let pprint_function_body body =
   print_string "\tbody:\n";
   List.map (fun item -> pprint_block_item "\t\t" item) body
 
-let pprint_function (FunDecl { fun_type; name; params; body }) =
+let pprint_function (Function { fun_type; name; params; body }) =
   let _ = pprint_function_decl fun_type name in
   let _ = pprint_function_params params in
   match body with
