@@ -1,6 +1,6 @@
 _build/
 *.byte
-*.s
+# *.s
 *.out
 _tags
 setup.data
