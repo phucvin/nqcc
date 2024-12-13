@@ -99,7 +99,7 @@ let generate filename prog =
 
   let print_globl_if_extern linkg lbl =
     if linkg = Context.External
-    then Printf.fprintf chan "    .globl _%s\n" lbl
+    then Printf.fprintf chan "    .globl %s\n" lbl
     else ()
   in
 
@@ -543,7 +543,7 @@ _post_loop:
          let _ = begin
              print_asm "    .text";
              print_globl_if_extern f_linkg fun_name;
-             Printf.fprintf chan "_%s:\n" fun_name;
+             Printf.fprintf chan "%s:\n" fun_name;
              print_asm "    push %ebp";
              print_asm "    movl %esp, %ebp"
            end

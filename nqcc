@@ -37,5 +37,7 @@ do
     shift
 done
 
-gcc-8 -m32 $assembly -o $out -fno-pie 2>/dev/null
-rm $assembly
+gcc -m32 $assembly -o $out.out -fno-pie
+$out.out
+echo "program returned $?"
+# rm $assembly
